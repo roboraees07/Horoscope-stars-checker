@@ -1,0 +1,54 @@
+import pyaztro
+from google.colab import widgets
+import ipywidgets
+from IPython.display import display, clear_output
+import pandas as pd
+
+pd.set_option("max_colwidth", None)
+
+# create output widget
+output = ipywidgets.widgets.Output()
+
+days = ['yesterday', 'today', 'tomorrow']
+data_type = ['Date', 'Mood', 'Compatibility', 'Lucky number', 'Lucky time', 'Lucky color', 'Description']
+df = pd.DataFrame(data_type,columns=[''])
+
+# register function to be called when the button is clicked
+
+def on_button_clicked(b):
+  # Display the message within the output widget.
+  with output:
+    clear_output()
+    sign_name = str(b.description)
+    for i in range(0,3):
+      # read sign information for each day
+      sign_info = pyaztro.Aztro(sign=sign_name, day=days[i])
+      df[days[i]] =[sign_info.current_date, sign_info.mood, sign_info.compatibility, sign_info.lucky_number, sign_info.lucky_time, sign_info.color, sign_info.description]
+    print('\n', 'Sign: ', str(b.description), '\n')
+    display(df)
+
+# create a list of buttons, one for each star sign
+button_list = []
+for i in range(0,12):
+  button = ipywidgets.widgets.Button(description=image_name[i]['name'])
+  button.on_click(on_button_clicked)
+  button_list.append(button)    
+  # arrange the sign images and buttons into two rows
+grid = widgets.Grid(1, 6, header_row=True, header_column=True) 
+newsize = (100, 100)
+for (row, col) in grid:
+  index = row*6+col
+  print("\n")
+  display(image_name[index]['image'].resize(newsize))
+  print("\n"+image_name[index]['date']+"\n")
+  display(button_list[index])
+for (row, col) in grid:
+  index = row*6+col
+  print("\n")
+  display(image_name[index+6]['image'].resize(newsize))
+  print("\n"+image_name[index+6]['date']+"\n")
+  display(button_list[index+6])
+
+# display output
+print('\nSelect your Star Sign by clicking the button\n')
+display(output)
